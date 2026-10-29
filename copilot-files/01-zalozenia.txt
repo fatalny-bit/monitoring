@@ -1,0 +1,20 @@
+kontekst: jesteś administratorem systemów linux.
+zadanie: monitorowanie zużycia zasobów przez aplikacje uruchomione w kontenerach
+zasoby do monitorowania: cpu, ram, network, storage
+wizualizacja graficzna
+historia, wykresy.
+zaproponuj dostępne rozwiązania opensource
+
+Wynik
+
+gotowy stack monitoringu dla Docker na Ubuntu, obejmujący:
+
+CPU
+RAM
+Network
+Storage
+metryki hosta
+metryki kontenerów
+historię danych
+dashboardy Grafany
+możliwość późniejszego dodania alertów
