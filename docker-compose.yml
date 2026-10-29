@@ -1,8 +1,8 @@
-version: "3.9"
-
 services:
 
   prometheus:
+    networks:
+      - monitoring
     image: prom/prometheus:latest
     container_name: prometheus
     restart: unless-stopped
@@ -16,6 +16,8 @@ services:
       - "--storage.tsdb.path=/prometheus"
 
   grafana:
+    networks:
+      - monitoring
     image: grafana/grafana-oss:latest
     container_name: grafana
     restart: unless-stopped
@@ -32,13 +34,16 @@ services:
     container_name: node-exporter
     restart: unless-stopped
     pid: host
-    network_mode: host
+    networks:
+      - monitoring
     command:
       - '--path.rootfs=/host'
     volumes:
       - '/:/host:ro,rslave'
 
   cadvisor:
+    networks:
+      - monitoring
     image: gcr.io/cadvisor/cadvisor:v0.49.1
     container_name: cadvisor
     restart: unless-stopped
@@ -55,3 +60,7 @@ services:
 volumes:
   prometheus-data:
   grafana-data:
+
+networks:
+  monitoring:
+    driver: bridge

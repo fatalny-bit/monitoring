@@ -1,0 +1,237 @@
+Poniżej gotowy stack monitoringu dla Docker na Ubuntu, obejmujący:
+
+CPU
+RAM
+Network
+Storage
+metryki hosta
+metryki kontenerów
+historię danych
+dashboardy Grafany
+możliwość późniejszego dodania alertów
+Struktura katalogów
+monitoring/
+├── docker-compose.yml
+├── prometheus/
+│   └── prometheus.yml
+└── grafana/
+
+docker-compose.yml
+version: "3.9"
+
+services:
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+
+  grafana:
+    image: grafana/grafana-oss:latest
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin123
+    volumes:
+      - grafana-data:/var/lib/grafana
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter
+    restart: unless-stopped
+    pid: host
+    network_mode: host
+    command:
+      - '--path.rootfs=/host'
+    volumes:
+      - '/:/host:ro,rslave'
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.49.1
+    container_name: cadvisor
+    restart: unless-stopped
+    privileged: true
+    ports:
+      - "8080:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro
+      - /dev/disk:/dev/disk:ro
+
+volumes:
+  prometheus-data:
+  grafana-data:
+
+prometheus/prometheus.yml
+
+Utwórz katalog:
+
+mkdir -p monitoring/prometheus
+
+
+Następnie plik:
+
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+
+  - job_name: 'prometheus'
+    static_configs:
+      - targets:
+          - localhost:9090
+
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets:
+          - host.docker.internal:9100
+
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets:
+          - cadvisor:8080
+
+Uruchomienie
+cd monitoring
+
+docker compose up -d
+
+
+Sprawdzenie:
+
+docker ps
+
+
+powinieneś zobaczyć:
+
+prometheus
+grafana
+node-exporter
+cadvisor
+
+Dostęp
+Grafana
+http://IP_SERWERA:3000
+
+
+logowanie:
+
+admin
+admin123
+
+Prometheus
+http://IP_SERWERA:9090
+
+cAdvisor
+http://IP_SERWERA:8080
+
+Gotowe dashboardy Grafany
+
+Po wejściu do Grafany:
+
+Data Source
+
+Dodaj:
+
+http://prometheus:9090
+
+Import dashboardów
+
+Menu:
+
+Dashboards
+→ Import
+
+
+Polecam:
+
+Docker Monitoring
+14282
+
+
+lub
+
+193
+
+Node Exporter Full
+
+Najpopularniejszy dashboard Linux:
+
+1860
+
+
+Pokaże:
+
+CPU
+Load Average
+RAM
+Swap
+Dyski
+Sieć
+I/O
+Co będziesz widział
+Host
+CPU %
+RAM %
+Swap
+Dysk %
+IOPS
+Network throughput
+
+Każdy kontener
+CPU
+RAM
+TX/RX
+Disk IO
+Restart count
+Uptime
+
+Historia
+
+Prometheus zapisuje dane na wolumenie:
+
+prometheus-data
+
+
+więc po restarcie kontenerów historia zostaje zachowana.
+
+Rozszerzenie produkcyjne
+
+Później warto dodać:
+
+Alertmanager
+Loki
+Promtail
+
+
+co da:
+
+alerty e-mail
+alerty Telegram
+logi wszystkich kontenerów
+korelację logów z metrykami w Grafanie
+
+Powstanie wtedy pełny stos obserwowalności:
+
+Grafana
+├─ Prometheus (metryki)
+├─ Loki (logi)
+├─ Alertmanager (alerty)
+├─ Node Exporter (host)
+└─ cAdvisor (kontenery)
+
+
+To jest obecnie jeden z najczęściej spotykanych open-source'owych stacków monitoringu dla serwerów Linux i Docker.
