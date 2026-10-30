@@ -14,8 +14,3 @@ scrape_configs:
   - job_name: 'cadvisor'
     static_configs:
       - targets: ['localhost:8080']
-
-  - job_name: 'docker'
-    metrics_path: /metrics
-    static_configs:
-      - targets: ['localhost:9323']
