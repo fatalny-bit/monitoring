@@ -1,1 +1,24 @@
-q
+Kontekst: Administrator systemów
+
+Uruchomić monitoroiwanie maszyny 192.168.0.6
+Uruchomić monitorowanie kontenerów na maszynie 192.168.0.6
+CONTAINER ID   IMAGE                                  COMMAND                  CREATED         STATUS                PORTS                                                                                                NAMES
+6bbae5774bd6   nginx:1.27-alpine                      "/docker-entrypoint.…"   2 weeks ago     Up 7 days             0.0.0.0:7001->80/tcp, [::]:7001->80/tcp                                                              biblioteka-nginx-1
+5f77123fc367   biblioteka-php                         "docker-php-entrypoi…"   2 weeks ago     Up 7 days             9000/tcp                                                                                             biblioteka-php-1
+ee72580d736f   portainer/portainer-ce:lts             "/portainer"             2 months ago    Up 7 days             0.0.0.0:9000->9000/tcp, [::]:9000->9000/tcp, 8000/tcp, 0.0.0.0:9443->9443/tcp, [::]:9443->9443/tcp   portainer
+f87caf9010f7   lscr.io/linuxserver/wireguard:latest   "/init"                  9 months ago    Up 7 days             0.0.0.0:51820->51820/udp, [::]:51820->51820/udp                                                      wireguard
+ba32c84ccfb4   lycheeorg/lychee                       "/entrypoint.sh nginx"   10 months ago   Up 7 days (healthy)   0.0.0.0:9001->80/tcp, [::]:9001->80/tcp                                                              lychee
+c8bd2fa04b6c   923218bed02a                           "docker-entrypoint.s…"   10 months ago   Up 7 days             3306/tcp                                                                                             mariadb_lychee
+76fd7ecf32b9   apache-mysql-client-php                "apachectl -D FOREGR…"   10 months ago   Up 7 days             0.0.0.0:8080->80/tcp, [::]:8080->80/tcp                                                              baza_plyt_apache
+bf852e5f7719   923218bed02a                           "docker-entrypoint.s…"   10 months ago   Up 7 days             0.0.0.0:3306->3306/tcp, [::]:3306->3306/tcp                                                          mariadb
+
+na hoście 192.168.0.106 mam przygotowane narzędzia (skonteneryzowane):
+prometheus
+graphana 
+node-exporter
+cadvisor
+
+Przygotuj instrukcję w krokach:
+1. przygotowanie i sprawdzenie połączeń sieciowych
+2. weryfikacja uprawnień i dostępów z narzędzi monitorujących do obektów monitorowanych
+3. konfiguracja narzędzi (metryki, dashboardy)
