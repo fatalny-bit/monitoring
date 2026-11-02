@@ -8,12 +8,26 @@ scrape_configs:
       - targets:
           - localhost:9090
 
-  - job_name: 'node-exporter'
+  - job_name: 'node-exporters'
     static_configs:
       - targets:
           - node-exporter:9100
+        labels:
+          host: cienias
 
-  - job_name: 'cadvisor'
+      - targets:
+          - 192.168.0.6:9100
+        labels:
+          host: kubek
+
+  - job_name: 'cadvisors'
     static_configs:
       - targets:
           - cadvisor:8080
+        labels:
+          host: cienias
+
+      - targets:
+          - 192.168.0.6:8080
+        labels:
+          host: kubek
